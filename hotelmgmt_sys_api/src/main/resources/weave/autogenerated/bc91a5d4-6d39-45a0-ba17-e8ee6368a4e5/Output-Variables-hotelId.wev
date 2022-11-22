@@ -1,4 +1,0 @@
-%dw 2.0
-
-type auto_bc91a5d4_6d39_45a0_ba17_e8ee6368a4e5_Output_Variables_hotelId = Array<Number {"typeId": "int"}>
-

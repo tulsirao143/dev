@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="put:\hotelInfo:application\json:hotelMgmt_sys_api-config" doc:id="d9ddff49-eaf7-4361-8912-eeb7d8508327" >
+		<logger level="INFO" doc:name="putflowstarted" doc:id="0be83199-cb8b-42a6-80aa-525c5dc5ff8e" />
+		<ee:transform doc:name="Transform Message" doc:id="d3b1079f-e64a-4c43-84ce-1e6fd68ed6b9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="dfc8aba8-0448-4398-8394-08a169cb0f91" />
+		<flow-ref doc:name="Flow Reference" doc:id="53f23c2d-e28c-4a22-a49e-c5cfa26b0f7c" name="put-Subflow"/>
+	</flow>
+	<sub-flow name="put-Subflow" doc:id="a42b0f30-5a64-4e93-aaf2-6d0946f974da" >
+		<logger level="INFO" doc:name="put Flow started" doc:id="20dfdea0-2192-4841-89c3-bfcb0cb0df1f" message="Putflow Started"/>
+		<mongo:find-documents doc:name="Find documents" doc:id="da44ee37-f64d-4a93-9137-2fc336cbd8be" config-ref="MongoDB_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="d08b5c09-df78-411c-b2af-7de5bdf48392" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="putflow completed" doc:id="c6094fa7-0299-45a2-8c28-a72de73c512a" message="putflow completed"/>
+		<choice doc:name="Choice" doc:id="26c1cb0e-8e12-43a9-bf76-72e4b31d1b31" >
+			<when expression="#[isEmpty(payload)]">
+				<flow-ref doc:name="Flow Reference" doc:id="2736378b-6469-45f1-8c4f-f2b9233fbe3b" name="updateHotel_id"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="1ef614e3-96ad-4724-8348-56c59c258487" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+		"message": "hotelID already updated"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="updateHotel_id" doc:id="f05e3d0a-f24e-4d66-9fa6-c4fc095d7de5" >
+		<logger level="INFO" doc:name="updatehotelid started" doc:id="6894a8fd-bc17-42f1-bfb9-6e02540459b2" />
+		<mongo:update-documents doc:name="Update documents" doc:id="e7cde86f-6ee6-47e8-9455-8d1b352a64a7" config-ref="MongoDB_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="167df2ed-196a-4cab-b250-21d2ef3fa500" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message" : "hotel info updated sucessFully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

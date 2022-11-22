@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_655d4d19_e4f5_42e7_8bba_ea5eb404a454_Input_Variables_hotelId = Array<Number {"typeId": "int"}>
+

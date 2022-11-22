@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="ea5e037f-efc6-4be6-8788-70bb68cb8c14" body="#[payload]" uri-params="" path="/api/hotelInfo" targetValue="#[payload]" correlationId="" query-params="" headers="" outputMimeType="" method="POST" url="" target="" outputEncoding="" config-ref="HTTP_Request_configuration">
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<flow name="post:\hotelInfo:application\json:hotelMgmt_proc_api-config" doc:id="97961197-f7aa-444c-a0a9-42d88270dae2" >
+		<ee:transform doc:name="Transform Message" doc:id="3dc9b157-3907-4e3f-991c-56138e4f3013" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Add hotelInfo backend api call" doc:id="1d86e1c8-1069-41ed-ac50-15c67c48661a" config-ref="HTTP_Request_configuration" path="/api/hotelInfo"/>
+		<ee:transform doc:name="Transform Message" doc:id="b39cc93b-ec6c-4c68-927d-502a2ef12f09" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

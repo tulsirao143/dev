@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd">
+	<flow name="get:\hotelInfo:hotelMgmt_sys_api-config" doc:id="ee76f4d9-7e17-4a8f-8637-a46a3f0fc0f2" >
+		<logger level="INFO" doc:name="Logger" doc:id="42422d46-ea92-4c67-9f17-beff9ffa465b" message="getflowstarted" />
+		<ee:transform doc:name="Transform Message" doc:id="5a1a868e-60a1-4c3d-8446-09814cd59e41">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="1317f984-a0fd-4bf6-bd7a-7eeab6a8d4f0" message="getFlowcompleted" />
+		<flow-ref doc:name="Flow Reference" doc:id="eafcd13e-b354-4897-bc3c-2ad1deb815a2" name="gethotelsubflow"/>
+	</flow>
+	<sub-flow name="gethotelsubflow" doc:id="4974f6ae-1ed2-48fa-9996-440133967d74">
+		<logger level="INFO" doc:name="mainFlow started" doc:id="435b454e-de99-4d23-8c54-c79fb5782b19" message="hotelinfo started" />
+		<mongo:find-documents doc:name="Find documents" doc:id="1898f1c1-7e4a-4573-a7a5-f5ed63223d18" config-ref="MongoDB_Config" />
+		<ee:transform doc:name="Transform Message" doc:id="e8fb6ed4-f45d-45f1-9615-e279b9139e3c">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<choice doc:name="Choice" doc:id="66320ead-725c-4ce7-98b3-50a36479c42a">
+			<when expression="#[!isEmpty(payload)]">
+				<ee:transform doc:name="Transform Message" doc:id="37562d2d-09e6-46a2-aa68-b8292927cf6e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="97a184ba-01b5-4ed1-83ab-787a4ddb4f35">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+ "message" :"hotelInfo not found"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:mongo="http://www.mulesoft.org/schema/mule/mongo"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mongo http://www.mulesoft.org/schema/mule/mongo/current/mule-mongo.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="post:\hotelInfo:application\json:hotelMgmt_sys_api-config" doc:id="a2744f7a-cf19-4732-8c2b-6639f3f77053" >
+		<logger level="INFO" doc:name="flow started" doc:id="9b9473ea-55ce-40b3-b0ce-51f37aa0519d" message="insert-flow-started"/>
+		<ee:transform doc:name="Transform Message" doc:id="0dc6d04f-90d7-47a3-9c46-ca3409e9b3c5" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="5ae5d26f-68c0-49a2-9e48-7d493a3112a6" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="hotelId" ><![CDATA[payload.hotelInfo.hotelId]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="5f7b4f64-ad7f-485f-9bf3-4ae2b6d0f950" name="searchHotel-Subflow"/>
+	</flow>
+	<sub-flow name="searchHotel-Subflow" doc:id="655d4d19-e4f5-42e7-8bba-ea5eb404a454" >
+		<logger level="INFO" doc:name="searchFlow started" doc:id="3b7398d4-5620-4723-8db4-2eb4603e8b6f" message="SubsearchFlow started"/>
+		<mongo:find-documents collectionName="hotelInfo" fields="hotelName,hotellocation,hotelId,numberofRoomwithoutAc,numberofRoomwithtAc,Aminites,hotelAddress,contactNumber,maiAddress,contactPerson" doc:name="Find documents" doc:id="9e90c6b7-b81c-4043-b536-beeb1e8a7156" config-ref="MongoDB_Config"/>
+		<ee:transform doc:name="Transform Message" doc:id="5325f244-8f8b-4cef-bb80-2690d04496a5">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="serchFlow Responce" doc:id="2df0578a-5f2b-40c0-bf04-f8f55f3e3881" message="Searchflow completed"/>
+		<choice doc:name="Choice" doc:id="13e15972-81ec-40bf-9580-a529f509ee9b" >
+			<when expression="#[isEmpty(payload)]">
+				<flow-ref doc:name="Flow Reference" doc:id="d9e3cfaa-430e-4bc2-8eaa-b9a2371e8b9c" name="addhotelid"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="740b8619-57d7-4ad4-a391-da2fcc1eb6e7" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "hotel info already exist"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="addhotelid" doc:id="bc91a5d4-6d39-45a0-ba17-e8ee6368a4e5" >
+		<logger level="INFO" doc:name="addhotelinfo" doc:id="1790c09c-449e-4099-bcbc-f96cdc2b4601" message="addHotelinfo Started"/>
+		<mongo:insert-documents collectionName="hotelInfo" doc:name="Insert documents" doc:id="f9368743-e441-4c83-a95e-2c4939703e80" config-ref="MongoDB_Config"/>
+		<choice doc:name="Choice" doc:id="b70c6455-2eb1-4f45-96b7-f92b8cca41e9" >
+			<when expression="#[payload == 1]">
+				<ee:transform doc:name="Transform Message" doc:id="0d005c10-6bb2-49f2-a02e-124e422a1d04">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "hotel info added successfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise >
+				<raise-error doc:name="Raise error" doc:id="0676c770-b5a6-4483-8da8-7bbf5731c32b" type="backend error" description='"faild to add hotelInfo"'/>
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="addHotelinfo" doc:id="5d392406-1e93-4ac3-ad8c-ba47e91e3de7" message="hotelinfo flow completed"/>
+	</sub-flow>
+</mule>

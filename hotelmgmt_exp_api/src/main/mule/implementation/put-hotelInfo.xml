@@ -6,7 +6,7 @@
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<sub-flow name="put:\hotelInfo:application\json:hotelMgmt_exp_api-config" doc:id="6a221943-8fee-4b0d-83e1-720e9b982d67" >
-		<ee:transform doc:name="Transform Message" doc:id="ad1c4032-7efe-4195-9abb-ddfb7799b5df" >
+		<ee:transform doc:name="TM" doc:id="ad1c4032-7efe-4195-9abb-ddfb7799b5df" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
